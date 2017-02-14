@@ -19,10 +19,10 @@
 	class UserDuplicateEmailException extends \LogicException{
 		private $requested_email;
 
-		public function __construct($code=100, $message="", $last_ex=null, $requested_email=""){
-			parent::__construct($code, $message, $last_ex);
+		public function __construct($message="", $requested_email=""){
+			parent::__construct(100, $message, null);
 			$this->requested_email = $requested_email;
-			$this->message = printf("The requested email: %s, exists in the database please select another", $this->requested_email);
+			$this->message = ($message === "")?printf("The requested email: %s, exists in the database please select another", $this->requested_email):$message;
 		}
 
 		public function getRequestedEmail(){

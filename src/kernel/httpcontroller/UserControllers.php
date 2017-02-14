@@ -7,6 +7,7 @@
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\HttpFoundation\JsonResponse;
 	use MyApp\Kernel\Entity\User;
+	use MyApp\Kernel\Exception\UserDuplicateEmailException;
 
 	class UserControllers implements ControllerProviderInterface{
 		/**
@@ -36,16 +37,21 @@
 				->assert("^\d+$", "id");
 
 			$controllers->post("/user.add", function(Request $request) use($app){
-				$user_object = new User();
-				$user_object->setEmail($request->get("email"));
-				$user_object->setPass($request->get("pass"));
+				try{
+					$user_object = new User();
+					$user_object->setEmail($request->get("email"));
+					$user_object->setPass($request->get("pass"));
 
-				$user_inserted = $app["repository.users"]->add($user_object);
+					$user_inserted = $app["repository.users"]->add($user_object);
 
-				if($user_inserted)
-					return new JsonResponse(["msg" => "The user was inserted correctly in database"], 201);
-
-				return new JsonResponse(["msg" => "The user was not inserted in the database, because the email exists"], 400);
+					if($user_inserted)
+						return new JsonResponse(["msg" => "The user was inserted correctly in database"], 201);
+					else
+						throw new UserDuplicateEmailException("", $user_object->getEmail());
+				}
+				catch(UserDuplicateEmailException $ex){
+					return new JsonResponse(["msg" => $ex->getMessage()], 400);
+				}
 			})
 				->before(function(Request $request, Application $app){
 					$email = $request->get("email");

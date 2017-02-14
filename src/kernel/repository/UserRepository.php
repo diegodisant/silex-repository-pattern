@@ -8,7 +8,6 @@
 	use MyApp\Kernel\Repository\Repository;
 	use MyApp\Kernel\Repository\IRepository;
 	use MyApp\Kernel\Repository\ICrudRepository;
-	use MyApp\Kernel\Exception\UserDuplicateEmailException;
 
 	class UserRepository extends Repository implements IRepository, ICrudRepository{
 		public function __construct(Application $app){
