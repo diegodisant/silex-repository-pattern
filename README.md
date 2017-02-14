@@ -52,7 +52,60 @@ Eliminar un usuario|user.panel/user.del|post|Elimina un usuario de la base de da
 
 ###Modelado
 
+![model](https://raw.githubusercontent.com/captaincode0/silex-repository-pattern/master/screenshots/model.jpg)
 
+La interfaz `ÌEntity` se usa para crear un tipo de dato que extiente a todas las entidades, el cual contiene un método to Array que castea la entidad a un arreglo, fue anexado para usos a futuro.
+
+```php
+    class MyEntity implements IEntity{
+    }
+```
+
+La interfaz `ICrudRepository` se usa para definir repositorios que contengan operaciones de un CRUD y la interfaz `IRepository` se usa para definir un tipo`de dato.
+
+Tal como se puede observar en el siguiente código ICrudRepository define las operaciones propias de un CRUD.
+
+```php
+    namespace MyApp\Kernel\Repository;
+
+    use MyApp\Kernel\Entity\IEntity;
+
+    interface ICrudRepository{
+        /**
+         * [add creates a new entity in the database]
+         * @param IEntity $entity [current entity]
+         * @return bool             [if the entity was added true]
+         */
+        public function add(IEntity $entity);
+        
+        /**
+         * [edit updates an existent entity on the database]
+         * @param  IEntity $entity [current entity]
+         * @return bool            [if the entity was edited correctly true]
+         */
+        public function edit(IEntity $entity);
+        
+        /**
+         * [del removes an existent entity on the database]
+         * @param  int $entity_id [current entity id]
+         * @return bool          [if the entity was deleted correctly true]
+         */
+        public function del($entity_id);
+        
+        /**
+         * [getById retrieves one entity by id]
+         * @param  int $entity_id [the current entity id]
+         * @return array          [one array that represents the entity, null if there is not the requested entity in the database]
+         */
+        public function getById($entity_id);
+
+        /**
+         * [getAll retrieves all the data from database]
+         * @return array [one array that represents all the data, null if there is not entities in the database]
+         */
+        public function getAll();
+    }
+```
 
 ###Nombres de espacio de la aplicación
 
@@ -67,11 +120,55 @@ MyApp\Kernel\Repository|Almacena todos los repositorios de la aplicación.
 
 La validación de los parámetros de las entidades se hace mediante el módulo Validator de Symfony, el cual para validar objetos implementa una función estática llamada `loadValidatorMetadata(ClassMetadata $metadata)`.
 
+Tal como se puede ver en la entidad usuario se valida lo siguiente que el id del usuario sean números positivos, que el email sea válido, que la contraseña tenga por lo menos seis caracteres letras mayúsculas, minúsculas y números.
 
+```php
+    public static function loadValidatorMetadata(ClassMetadata $metadata){
+            $metadata->addPropertyConstraint("id", new Assert\Regex([
+                "pattern" => "/^\d+$/",
+                "message" => "The user id needs to be a number"
+            ]));
+
+            $metadata->addPropertyConstraint("email", new Assert\Email([
+                "message" => "The user email needs to be valid"
+            ]));
+
+            $metadata->addPropertyConstraint("pass", new Assert\Regex([
+                "pattern" => "/^[a-zA-Z_0-9]{6,}$/",
+                "message" => "The password needs to contain at least six numbers or lower characters or upper characters or a mix between them"
+            ]));
+        }
+```
+
+Para validar el objeto actual y ver que todos sus parámetros o campos sean integros, entonces se ejecuta en un middleware before, como en el siguiente ejemplo:
+
+```php
+    ->before(function(Request $request, Application $app){
+        $email = $request->get("email");
+        $pass = $request->get("pass");
+
+        $user_object = new User();
+        $user_object->setEmail($email);
+        $user_object->setPass($pass);
+        
+        $errors = $app["validator"]->validate($user_object);
+
+        //check if exists errors in the validation
+        if(count($errors) > 0){
+            $msg = "";
+
+            //concatenate the errors
+            foreach($errors as $error)
+                $msg .= $error->getMessage()."\n";
+
+            return new JsonResponse(["msg" => $msg], 400);
+        }
+    });
+```
 
 ##Creando repositorios para entidades
 
-Si tu repositorio es de tipo CRUD debes crearlo implementando la interface ICrudRepository y IRepository, en caso contrario solamente debes implementar la clase IRepository.
+Si tu repositorio es de tipo CRUD debes crearlo implementando la interface `ICrudRepository` y `IRepository`, en caso contrario solamente debes implementar la interfaz `IRepository`.
 
 ```php
     namespace MyApp\Kernel\Repository;
@@ -128,7 +225,57 @@ Si tu repositorio es de tipo CRUD debes crearlo implementando la interface ICrud
     }
 ```
 
+##Registar un repositorio
+
+Para registrar un repositorio en la aplicación se hace mediante servicios compartidos, al ser compartido mejora el rendimiento de tu aplicación porque no crea al servicio cada vez que se usa, mantiene la misma instancia, para usarse una y otra vez.
+
+```php
+    $app["repository.users"] = $app->share(function() use($app){
+        return new UserRepository($app);
+    });
+```
+
+**El servicio requiere de la aplicación actual para acceder a servicios como Doctrine para accesar a bases de datos**
+
 ##Prueba de la aplicación
+
+###Obtener todos los usuarios
+
+![view all users](https://raw.githubusercontent.com/captaincode0/silex-repository-pattern/master/screenshots/get-all-users.png)
+
+###Obtener un usuario
+
+![view one user by id](https://raw.githubusercontent.com/captaincode0/silex-repository-pattern/master/screenshots/get-one-user.png)
+
+###Añadir un usuario
+
+![add one user](https://raw.githubusercontent.com/captaincode0/silex-repository-pattern/master/screenshots/add-new-user.png)
+
+En la siguiente imagen se puede ver al usuario añadido correctamente con el id igual a 9:
+
+![view user added](https://raw.githubusercontent.com/captaincode0/silex-repository-pattern/master/screenshots/get-final-users.png)
+
+###Añadir un usuario repetido
+
+Al añadir un usuario con un email que exista en la base de datos, se obtiene un mensaje de error con un código 400 Bad Request.
+
+![user repeated](https://raw.githubusercontent.com/captaincode0/silex-repository-pattern/master/screenshots/insert-replicate%20-email.png)
+
+###Editar un usuario
+
+En la siguiente imagen se edita la contraseña del usuario de 1234567 a mypassword.
+
+![edit user password](https://raw.githubusercontent.com/captaincode0/silex-repository-pattern/master/screenshots/edit-user-password.png)
+
+##Eliminar un usuario
+
+En la siguiente imagen se elimina un usuario que tiene el id asignado a 8.
+
+![delete user 8](https://raw.githubusercontent.com/captaincode0/silex-repository-pattern/master/screenshots/del-user-8.png)
+
+En la siguiente imagen se puede ver que el usuario ha sido eliminado correctamente de la base de datos.
+
+![user deleted](https://raw.githubusercontent.com/captaincode0/silex-repository-pattern/master/screenshots/view-user-deleted-8.png)
 
 ##Referencias
 
