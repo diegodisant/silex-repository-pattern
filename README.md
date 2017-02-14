@@ -1,8 +1,12 @@
 # Silex Repository Pattern (Patrón de Repositorio Aplicado al Framework Silex)
 
-Los repositorios en Silex son servicios que contienen la lógica de una entidad y agrupan las operaciones básicas como agregar, editar, eliminar y ver, si se integran con un origen de datos.
+Los repositorios en Silex son servicios que contienen la lógica de una entidad y agrupan las operaciones que se realizan al origen de datos, el repositorio contiene un conjunto de métodos accesibles por la aplicación, en este caso controladores Http que establecen la lógica, restricciones y estados de la aplicación.
 
-Como por ejemplo si tenemos una web app que permite postear estados, la clase `Post` sería mi entidad y `PostRepository` sería el repositorio para la entidad.
+![repository pattern](https://i-msdn.sec.s-msft.com/dynimg/IC340233.png)
+
+*Fuente: Microsoft Developer Network - Repository Pattern*
+
+Por ejemplo si tenemos una web app que permite postear estados, la clase `Post` sería mi entidad y `PostRepository` sería el repositorio para la entidad.
 
 ##Instalación
 
@@ -464,4 +468,5 @@ En la siguiente imagen se puede ver que el usuario ha sido eliminado correctamen
 1. [Doctrine](http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/).
 2. [Validator Service Provider](http://librosweb.es/libro/silex/apendice_a/validatorserviceprovider.html).
 3. [Doctrine Service Provider](http://librosweb.es/libro/silex/apendice_a/validatorserviceprovider.html).
-4. [How to create repository classes](http://symfony.com/doc/current/doctrine/repository.html)
+4. [How to create repository classes](http://symfony.com/doc/current/doctrine/repository.html).
+5. [Repository Pattern](https://msdn.microsoft.com/en-us/library/ff649690.aspx)
