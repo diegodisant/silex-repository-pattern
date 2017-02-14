@@ -25,7 +25,7 @@
 		private $email;
 		private $pass;
 
-		public function __construct($id=-1, $email="", $pass=""){
+		public function __construct($id=0, $email="", $pass=""){
 			$this->id = $id;
 			$this->email = $email;
 			$this->pass = $pass;
@@ -77,7 +77,7 @@
 				"message" => "The user email needs to be valid"
 			]));
 
-			$metadata->addPropertyConstraint("password", new Assert\Regex([
+			$metadata->addPropertyConstraint("pass", new Assert\Regex([
 				"pattern" => "/^[a-zA-Z_0-9]{6,}$/",
 				"message" => "The password needs to contain at least six numbers or lower characters or upper characters or a mix between them"
 			]));

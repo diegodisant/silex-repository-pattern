@@ -19,7 +19,7 @@
 	use Silex\Application;
 
 	abstract class Repository{
-		private $app;
+		protected $app;
 
 		public function __construct(Application $app){
 			$this->app = $app;

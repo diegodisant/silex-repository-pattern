@@ -1,2 +1,3 @@
-# silex-repository-pattern
-An example of repository pattern applied to silex
+# Silex Repository Pattern
+
+A repository contains all the logic for one
