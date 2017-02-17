@@ -8,6 +8,11 @@ Los repositorios en Silex son servicios que contienen la lógica de una entidad 
 
 Por ejemplo si tenemos una web app que permite postear estados, la clase `Post` sería mi entidad y `PostRepository` sería el repositorio para la entidad.
 
+##Contenido
+
+1. Instalación
+2. Arquitectura.
+
 ##Instalación
 
 Para instalar la aplicación y testearla se ejecutan los siguientes comandos:
@@ -27,7 +32,7 @@ Para instalar la aplicación y testearla se ejecutan los siguientes comandos:
     mysql -u myuser -p < db.sql
 
     #abrir una nueva ventana de firefox y mostrar los usuarios de la base de datos
-    firefox --new-window http://127.0.0.1/silex-repository-pattern/web/index.php/private/users.panel/users.json
+    firefox --new-window http://127.0.0.1/silex-repository-pattern/web/index.php/private/user.panel/users.json
 ```
 
 Una vez abierto el navegador se visualizarán todos los usuarios de la base de datos.
@@ -41,7 +46,7 @@ La aplicación usa una arquitectura basada en componentes y orientada a servicio
 Nombre|Ruta HTTP|Métodos Aceptados|Descripción
 ---|---|---|---
 Obtener todos los usuarios|user.panel/users.json|get|Obtiene todos los usuarios de la base de datos y los retorna en formato JSON.
-Obtener un usuario por id|user.panel/user.json/{id}|get|Obtiene un usuario por identificador y lo retorna en formatio JSON.
+Obtener un usuario por id|user.panel/user.json/{id}|get|Obtiene un usuario por identificador y lo retorna en formato JSON.
 Añadir un usuario|user.panel/user.add|post|Añade un usuario a la base de datos siempre y cuando el email del usuario no exista.
 Editar un usuario|user.panel/user.edit|post|Edita un usario de la base de datos siempre y cuando el id exista en la base de datos.
 Eliminar un usuario|user.panel/user.del|post|Elimina un usuario de la base de datos siempre y cuando el id exista en la base de datos.
